@@ -10,7 +10,9 @@ It exports everything into a zip package which can be used to automatically impo
 ### Install ###
 
 #### Via WP-CLI Package Manager (requires wp-cli >= 0.23)
-Just run `wp package install 10up/mu-migration`
+Just run `wp package install 10up/mu-migration`.
+
+If you run into memory issues when installing the package, it's a known WP-CLI issue. [Check this out for a workaround](https://make.wordpress.org/cli/handbook/common-issues/#php-fatal-error-allowed-memory-size-of-999999-bytes-exhausted-tried-to-allocate-99-bytes).
 #### Installing as a plugin
 Clone this repo onto `plugins/` folder, run `composer install` to fetch dependencies and activate the plugin.
 
@@ -21,7 +23,7 @@ Moving single WordPress sites to a Multisite environment (or the opposite) can b
 Multisite. You'd need to replace tables prefix, update post_author and wc_customer_user (if WooCommerce is installed) with the new
 users ID (Multisite has a shared users table, so if you're moving more than one site you can't guarantee that users will have the same IDs) and more.
 
-There are also a few housekeeping tasks that needs to be done to make sure that the new site will work smoothly and without loosing any data.
+There are also a few housekeeping tasks that needs to be done to make sure that the new site will work smoothly and without losing any data.
 
 ### How it works ###
 
@@ -45,7 +47,7 @@ The following command can be used to import a site from a zip package.
 ```
 $ wp mu-migration import all site.zip
 ```
-If importing into Multisite, it will create a new site within your Multisite network based on the site you have just exported, if importing into a single install, it will override your single install with the exported subsite. 
+If importing into Multisite, it will create a new site within your Multisite network based on the site you have just exported, if importing into a single install, it will override your single install with the exported subsite.
 
 The `import all` command will take care
 of everything that needs to be done when moving a site to Multisite (replacing tables prefix, updating post_author IDs and etc).

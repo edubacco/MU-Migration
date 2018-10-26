@@ -390,9 +390,9 @@ class ImportCommand extends MUMigrationBase {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *      wp mu-migration import all site.zip
+	 *      wp mu-migration import all site.zip --uid_fields=_content_audit_owner
 	 *
-	 * @synopsis <zipfile> [--blog_id=<blog_id>] [--new_url=<new_url>] [--verbose] [--mysql-single-transaction]
+	 * @synopsis <zipfile> [--blog_id=<blog_id>] [--new_url=<new_url>] [--verbose] [--mysql-single-transaction] [--uid_fields=<uid_fields>]
 	 *
 	 * @param array $args
 	 * @param array $assoc_args
@@ -405,6 +405,7 @@ class ImportCommand extends MUMigrationBase {
 				'blog_id'                  => '',
 				'new_url'                  => '',
 				'mysql-single-transaction' => false,
+				'uid_fields' => '',
 			),
 			$assoc_args
 		);
@@ -530,6 +531,7 @@ class ImportCommand extends MUMigrationBase {
 				array( $map_file ),
 				array(
 					'blog_id' => $blog_id,
+					'uid_fields' => $assoc_args['uid_fields'],
 				),
 				$verbose
 			);
@@ -572,8 +574,8 @@ class ImportCommand extends MUMigrationBase {
 			foreach ( $plugins as $plugin_name => $plugin ) {
 				$plugin_folder = dirname( $plugin_name );
 				$fullPluginPath = $plugins_dir . '/' . $plugin_folder;
-				
-				if ( $check_plugins &&  ! in_array( $plugin_name, $blog_plugins, true ) && 
+
+				if ( $check_plugins &&  ! in_array( $plugin_name, $blog_plugins, true ) &&
 					! in_array( $plugin_name, $network_plugins, true ) ) {
 					continue;
 				}
@@ -654,7 +656,7 @@ class ImportCommand extends MUMigrationBase {
 		$parsed_url = parse_url( esc_url( $meta_data->url ) );
 		$site_id    = 1;
 
-		$parsed_url['path'] = isset($parsed_url['path'])? $parsed_url['path'] : '/';
+		$parsed_url['path'] = isset( $parsed_url['path'] ) ? $parsed_url['path'] : '/';
 
 		if ( domain_exists( $parsed_url['host'], $parsed_url['path'], $site_id ) ) {
 			return false;
@@ -713,9 +715,9 @@ class ImportCommand extends MUMigrationBase {
 	 * @return bool
 	 */
 	private function check_for_sed_presence( $exit_on_error = false ) {
-		$sed = \WP_CLI::launch( 'sed --version', false, false );
+		$sed = \WP_CLI::launch( 'echo "wp_" | sed "s/wp_/wp_5_/g"', false, true );
 
-		if ( 0 !== $sed ) {
+		if ( 'wp_5_' !== trim( $sed->stdout, "\x0A" ) ) {
 			if ( $exit_on_error ) {
 				\WP_CLI::error( __( 'sed not present, please install sed', 'mu-migration' ) );
 			}
